@@ -24,3 +24,5 @@ services:
         sync: false
       - key: ML_SERVICE_URL
         sync: false
+      - key: HEADACHE_DIARY_ML_SERVICE_URL
+        value: https://prototype-migraine-ml-service.onrender.com/predict-headache-diary
