@@ -69,6 +69,53 @@ input {
   font-weight: 600;
 }
 
+.model-tabs {
+  display: inline-flex;
+  gap: 8px;
+  margin-bottom: 22px;
+  padding: 6px;
+  border: 1px solid rgba(18, 32, 51, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 12px 28px rgba(26, 54, 93, 0.07);
+}
+
+.model-tabs button {
+  padding: 11px 16px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: #35526f;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.model-tabs button.active {
+  background: linear-gradient(135deg, #235b8b 0%, #1e7f79 100%);
+  color: #ffffff;
+}
+
+.soft-panel {
+  margin-bottom: 22px;
+  background: rgba(255, 255, 255, 0.76);
+}
+
+.model-context h2 {
+  margin-bottom: 8px;
+}
+
+.model-context p {
+  max-width: 920px;
+  margin: 0;
+  color: #4b6078;
+}
+
+.model-context .source-note {
+  margin-top: 10px;
+  color: #5f7288;
+  font-size: 0.94rem;
+}
+
 .layout {
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;
@@ -97,7 +144,8 @@ input {
   gap: 16px;
 }
 
-.prediction-form label {
+.prediction-form label,
+.checkbox-field {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -125,7 +173,8 @@ input {
   outline-offset: 2px;
 }
 
-.prediction-form button {
+.prediction-form button,
+.checkbox-form button {
   grid-column: 1 / -1;
   padding: 14px 18px;
   border: none;
@@ -136,9 +185,37 @@ input {
   cursor: pointer;
 }
 
-.prediction-form button:disabled {
+.prediction-form button:disabled,
+.checkbox-form button:disabled {
   cursor: wait;
   opacity: 0.75;
+}
+
+.checkbox-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.checkbox-field {
+  flex-direction: row;
+  align-items: center;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid #d8e2ec;
+  border-radius: 14px;
+  background: #fbfdff;
+}
+
+.checkbox-field input {
+  width: 18px;
+  height: 18px;
+  accent-color: #1e7f79;
+}
+
+.form-note {
+  margin-top: -6px;
+  margin-bottom: 16px;
 }
 
 .result-panel {
@@ -152,6 +229,10 @@ input {
   border-radius: 18px;
   background: linear-gradient(160deg, #163a57 0%, #265e80 100%);
   color: #ffffff;
+}
+
+.diary-card {
+  background: linear-gradient(160deg, #174d4e 0%, #247c6b 100%);
 }
 
 .result-badge {
@@ -232,11 +313,20 @@ th {
     grid-template-columns: 1fr;
   }
 
-  .prediction-form {
+  .prediction-form,
+  .checkbox-form {
     grid-template-columns: 1fr;
   }
 
   .result-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .model-tabs {
+    display: grid;
+    width: 100%;
+    border-radius: 18px;
   }
 }

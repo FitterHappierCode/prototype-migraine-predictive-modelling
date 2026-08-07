@@ -6,6 +6,9 @@ const Prediction = require("../models/Prediction");
 const router = express.Router();
 const mlServiceUrl =
   process.env.ML_SERVICE_URL || "http://127.0.0.1:8000/predict";
+const headacheDiaryMlServiceUrl =
+  process.env.HEADACHE_DIARY_ML_SERVICE_URL ||
+  "http://127.0.0.1:8000/predict-headache-diary";
 
 // Save a new prediction after sending the user input to the Python ML service.
 router.post("/", async (req, res) => {
@@ -53,6 +56,27 @@ router.post("/", async (req, res) => {
 
     res.status(500).json({
       message: "Failed to create prediction",
+      error: error.message,
+    });
+  }
+});
+
+// Send headache diary trigger inputs to the second Python ML model.
+router.post("/headache-diary", async (req, res) => {
+  try {
+    const mlResponse = await axios.post(headacheDiaryMlServiceUrl, req.body);
+
+    res.status(200).json(mlResponse.data);
+  } catch (error) {
+    if (error.response) {
+      return res.status(502).json({
+        message: "Headache diary ML service returned an error",
+        details: error.response.data,
+      });
+    }
+
+    res.status(500).json({
+      message: "Failed to create headache diary prediction",
       error: error.message,
     });
   }
