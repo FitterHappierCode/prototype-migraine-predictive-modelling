@@ -8,7 +8,7 @@ const mlServiceUrl =
   process.env.ML_SERVICE_URL || "http://127.0.0.1:8000/predict";
 const headacheDiaryMlServiceUrl =
   process.env.HEADACHE_DIARY_ML_SERVICE_URL ||
-  "http://127.0.0.1:8000/predict-headache-diary";
+  mlServiceUrl.replace(/\/predict\/?$/, "/predict-headache-diary");
 
 // Save a new prediction after sending the user input to the Python ML service.
 router.post("/", async (req, res) => {
