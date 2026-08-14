@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Migraine and Headache Risk Prediction Prototype</title>
+    <style>
+      :root {
+        font-family: Arial, Helvetica, sans-serif;
+        color: #122033;
+        background: #eef3f8;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: linear-gradient(180deg, #f7fbff 0%, #eef3f8 100%);
+      }
+      main {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 34px 20px 54px;
+      }
+      h1 {
+        margin: 0 0 12px;
+        font-size: clamp(2rem, 5vw, 3.3rem);
+        line-height: 1.08;
+      }
+      h2 { margin-top: 0; }
+      .intro {
+        max-width: 850px;
+        color: #425872;
+        font-size: 1.05rem;
+      }
+      .disclaimer, .source-note {
+        margin: 18px 0;
+        padding: 14px 16px;
+        border-radius: 14px;
+        font-weight: 700;
+      }
+      .disclaimer {
+        border-left: 4px solid #c96a2b;
+        background: #fff4ea;
+        color: #7b4015;
+      }
+      .source-note {
+        border-left: 4px solid #235b8b;
+        background: #edf6ff;
+        color: #244b70;
+        font-weight: 600;
+      }
+      .tabs {
+        display: inline-flex;
+        gap: 8px;
+        margin: 16px 0 24px;
+        padding: 6px;
+        border-radius: 999px;
+        background: #ffffff;
+        box-shadow: 0 14px 30px rgba(26, 54, 93, 0.08);
+      }
+      .tabs button, form button {
+        border: none;
+        cursor: pointer;
+        font-weight: 800;
+      }
+      .tabs button {
+        padding: 12px 18px;
+        border-radius: 999px;
+        background: transparent;
+        color: #35526f;
+      }
+      .tabs button.active {
+        background: linear-gradient(135deg, #235b8b 0%, #1e7f79 100%);
+        color: white;
+      }
+      .panel {
+        margin-bottom: 22px;
+        padding: 24px;
+        border: 1px solid rgba(18, 32, 51, 0.08);
+        border-radius: 22px;
+        background: rgba(255, 255, 255, 0.94);
+        box-shadow: 0 18px 40px rgba(26, 54, 93, 0.08);
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 22px;
+      }
+      form {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+      label {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        color: #2a3d54;
+        font-weight: 700;
+      }
+      small {
+        color: #65798f;
+        font-weight: 500;
+      }
+      input[type="number"], input[type="date"] {
+        width: 100%;
+        padding: 13px 14px;
+        border: 1px solid #c9d4e0;
+        border-radius: 13px;
+        background: #fbfdff;
+        color: #122033;
+      }
+      .checkbox-form label {
+        flex-direction: row;
+        align-items: center;
+        min-height: 48px;
+        padding: 12px 14px;
+        border: 1px solid #d8e2ec;
+        border-radius: 14px;
+        background: #fbfdff;
+      }
+      input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #1e7f79;
+      }
+      form button {
+        grid-column: 1 / -1;
+        padding: 15px 18px;
+        border-radius: 15px;
+        background: linear-gradient(135deg, #235b8b 0%, #1e7f79 100%);
+        color: #fff;
+      }
+      .result-card {
+        padding: 22px;
+        border-radius: 18px;
+        background: linear-gradient(160deg, #163a57 0%, #265e80 100%);
+        color: #fff;
+      }
+      .badge {
+        display: inline-block;
+        margin-bottom: 18px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.16);
+        font-weight: 800;
+      }
+      .muted { color: #5f7288; }
+      .error { color: #a32727; font-weight: 800; }
+      .hidden { display: none; }
+      @media (max-width: 850px) {
+        .layout, form { grid-template-columns: 1fr; }
+        .tabs { display: flex; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="muted"><strong>MSc AI Project Demo</strong></p>
+        <h1>Migraine and Headache Risk Prediction Prototype</h1>
+        <p class="intro">
+          This web-based prototype demonstrates two separate machine-learning models: a lifestyle-based migraine occurrence model and a headache diary trigger model.
+        </p>
+        <div class="disclaimer">This prototype is for educational and research purposes only. It is not a medical diagnosis tool.</div>
+      </header>
+
+      <nav class="tabs">
+        <button id="lifestyleTab" class="active" type="button">Lifestyle Migraine Risk</button>
+        <button id="diaryTab" type="button">Headache Diary Risk</button>
+      </nav>
+
+      <section id="lifestyleSection">
+        <section class="panel">
+          <h2>Lifestyle-Based Migraine Occurrence Model</h2>
+          <p class="muted">Uses sleep, mood, stress, hydration, screen time and date features from the original lifestyle dataset.</p>
+        </section>
+        <section class="layout">
+          <section class="panel">
+            <h2>Enter Lifestyle Information</h2>
+            <form id="lifestyleForm">
+              <label>Sleep Hours<input name="sleep_hours" type="number" min="0" max="24" step="0.1" value="5" required /></label>
+              <label>Mood Level<small>1 = very low, 10 = very positive</small><input name="mood_level" type="number" min="1" max="10" step="1" value="5" required /></label>
+              <label>Stress Level<small>1 = very low, 10 = very high</small><input name="stress_level" type="number" min="1" max="10" step="1" value="5" required /></label>
+              <label>Hydration Level<small>1 = very low, 10 = very good</small><input name="hydration_level" type="number" min="1" max="10" step="1" value="5" required /></label>
+              <label>Screen Time (hours)<input name="screen_time" type="number" min="0" max="24" step="0.1" value="5" required /></label>
+              <label>Date for this record<small>Select the date these lifestyle details apply to.</small><input name="date" type="date" required /></label>
+              <button type="submit">Predict Migraine Risk</button>
+            </form>
+            <p id="lifestyleError" class="error"></p>
+          </section>
+          <section class="panel">
+            <h2>Prediction Result</h2>
+            <div id="lifestyleResult" class="muted">Submit the form to see the latest migraine risk prediction.</div>
+          </section>
+        </section>
+      </section>
+
+      <section id="diarySection" class="hidden">
+        <section class="panel">
+          <h2>Headache Diary Trigger Model</h2>
+          <p class="muted">Uses a separate published smartphone headache diary dataset and predicts headache day risk from trigger-style diary inputs.</p>
+          <div class="source-note">Reference dataset: Park et al. (2016), PLOS ONE smartphone headache diary study. This is used as the benchmark reference for diary variables and trigger categories.</div>
+        </section>
+        <section class="layout">
+          <section class="panel">
+            <h2>Select Diary Factors</h2>
+            <p class="muted">Tick the factors that apply to the diary day being considered.</p>
+            <form id="diaryForm" class="checkbox-form"></form>
+            <p id="diaryError" class="error"></p>
+          </section>
+          <section class="panel">
+            <h2>Headache Diary Result</h2>
+            <div id="diaryResult" class="muted">Submit the diary factors to see the headache day risk estimate.</div>
+          </section>
+        </section>
+      </section>
+    </main>
+
+    <script>
+      const today = new Date().toISOString().split("T")[0];
+      document.querySelector('input[name="date"]').value = today;
+
+      const diaryFields = [
+        ["preventive_medication_use", "Preventive medication used"], ["stress", "Stress"], ["excess_sleep", "Excess sleep"],
+        ["sleep_deprivation", "Sleep deprivation"], ["physical_fatigue", "Physical fatigue"], ["weather_temperature_change", "Weather/temperature change"],
+        ["excessive_sunlight", "Excessive sunlight"], ["noise", "Noise"], ["inappropriate_lighting", "Inappropriate lighting"],
+        ["specific_smell", "Specific smell trigger"], ["excess_alcohol", "Excess alcohol"], ["irregular_meals", "Irregular meals / fasting"],
+        ["overeating", "Overeating"], ["excess_caffeine", "Excess caffeine drinks"], ["excess_smoking", "Excess smoking"],
+        ["cheese_chocolate", "Cheese or chocolate"], ["travel", "Travel"], ["other_trigger", "Other trigger"],
+        ["emotional_change", "Strong emotional change"], ["exercise_trigger", "Exercise as trigger"], ["no_exercise", "No exercise"],
+        ["exercise_status", "Exercise done today"], ["vigorous_exercise", "Vigorous exercise"], ["moderate_exercise", "Moderate exercise"],
+        ["menstrual_phase", "Menstrual phase"], ["ovulation_phase", "Ovulation phase"]
+      ];
+
+      const diaryForm = document.getElementById("diaryForm");
+      diaryFields.forEach(([name, label]) => {
+        const field = document.createElement("label");
+        field.innerHTML = `<input type="checkbox" name="${name}" /> <span>${label}</span>`;
+        diaryForm.appendChild(field);
+      });
+      const diaryButton = document.createElement("button");
+      diaryButton.type = "submit";
+      diaryButton.textContent = "Predict Headache Risk";
+      diaryForm.appendChild(diaryButton);
+
+      function setTab(tab) {
+        const isLifestyle = tab === "lifestyle";
+        document.getElementById("lifestyleTab").classList.toggle("active", isLifestyle);
+        document.getElementById("diaryTab").classList.toggle("active", !isLifestyle);
+        document.getElementById("lifestyleSection").classList.toggle("hidden", !isLifestyle);
+        document.getElementById("diarySection").classList.toggle("hidden", isLifestyle);
+      }
+      document.getElementById("lifestyleTab").onclick = () => setTab("lifestyle");
+      document.getElementById("diaryTab").onclick = () => setTab("diary");
+
+      function pct(value) { return `${Math.round(Number(value) * 100)}%`; }
+      function resultHtml(data, text) {
+        return `<div class="result-card"><div class="badge">${data.risk_label}</div><h3>${text}</h3><p><strong>Probability:</strong> ${pct(data.probability)}</p><p>This is a risk-estimation prototype and not a diagnostic output.</p></div>`;
+      }
+
+      document.getElementById("lifestyleForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        document.getElementById("lifestyleError").textContent = "";
+        const form = new FormData(event.target);
+        const payload = Object.fromEntries(form.entries());
+        ["sleep_hours", "mood_level", "stress_level", "hydration_level", "screen_time"].forEach((key) => payload[key] = Number(payload[key]));
+        try {
+          const response = await fetch("/api/predictions", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.message || "Prediction failed");
+          const text = data.prediction === 1 ? "Migraine occurrence predicted" : "Migraine occurrence not predicted";
+          document.getElementById("lifestyleResult").innerHTML = resultHtml(data, text);
+        } catch (error) {
+          document.getElementById("lifestyleError").textContent = error.message;
+        }
+      });
+
+      document.getElementById("diaryForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        document.getElementById("diaryError").textContent = "";
+        const payload = {};
+        diaryFields.forEach(([name]) => payload[name] = event.target.elements[name].checked ? 1 : 0);
+        try {
+          const response = await fetch("/api/predictions/headache-diary", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.message || "Prediction failed");
+          const text = data.prediction === 1 ? "Headache day predicted" : "Headache-free day predicted";
+          document.getElementById("diaryResult").innerHTML = resultHtml(data, text);
+        } catch (error) {
+          document.getElementById("diaryError").textContent = error.message;
+        }
+      });
+    </script>
+  </body>
+</html>

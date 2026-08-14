@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
+const path = require("path");
 
 const predictionRoutes = require("./routes/predictionRoutes");
 
@@ -15,6 +16,9 @@ app.use(cors());
 
 // Parse incoming JSON request bodies.
 app.use(express.json());
+
+// Serve the deployed demo page from the backend for simple sharing.
+app.use("/demo", express.static(path.join(__dirname, "public")));
 
 // Connect to MongoDB using the connection string from the environment file.
 mongoose
