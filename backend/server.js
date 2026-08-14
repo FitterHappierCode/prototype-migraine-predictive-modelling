@@ -10,6 +10,14 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5000;
+const mongoUri = process.env.MONGO_URI;
+
+const mongoStateLabels = {
+  0: "disconnected",
+  1: "connected",
+  2: "connecting",
+  3: "disconnecting",
+};
 
 // Allow requests from other parts of the project, such as a future frontend.
 app.use(cors());
@@ -21,18 +29,41 @@ app.use(express.json());
 app.use("/demo", express.static(path.join(__dirname, "public")));
 
 // Connect to MongoDB using the connection string from the environment file.
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("MongoDB connected");
-  })
-  .catch((error) => {
-    console.error("MongoDB connection error:", error.message);
-  });
+// The backend can still run if MongoDB is unavailable, but saved history will not work.
+if (!mongoUri) {
+  console.warn("MONGO_URI is not set. Prediction history will not be saved.");
+} else {
+  mongoose
+    .connect(mongoUri, {
+      serverSelectionTimeoutMS: 10000,
+    })
+    .then(() => {
+      console.log("MongoDB connected");
+    })
+    .catch((error) => {
+      console.error("MongoDB connection error:", error.message);
+    });
+}
 
 // Simple health check route for confirming the backend is running.
 app.get("/", (req, res) => {
   res.json({ message: "MERN backend is running" });
+});
+
+// Health route for checking whether MongoDB is configured and connected.
+app.get("/api/health", (req, res) => {
+  const state = mongoose.connection.readyState;
+
+  res.json({
+    backend: "running",
+    mongo: {
+      configured: Boolean(mongoUri),
+      state,
+      state_label: mongoStateLabels[state] || "unknown",
+      database: mongoose.connection.name || null,
+      host: mongoose.connection.host || null,
+    },
+  });
 });
 
 // All prediction-related routes are grouped under this base path.
