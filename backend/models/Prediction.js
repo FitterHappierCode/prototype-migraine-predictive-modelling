@@ -38,6 +38,14 @@ const predictionSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    ai_explanation: {
+      type: String,
+      default: "",
+    },
+    explanation_source: {
+      type: String,
+      default: "rule_based",
+    },
     createdAt: {
       type: Date,
       default: Date.now,

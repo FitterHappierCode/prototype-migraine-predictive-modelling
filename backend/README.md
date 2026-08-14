@@ -42,7 +42,12 @@ Use the following values in your `.env` file:
 PORT=5000
 MONGO_URI=mongodb://127.0.0.1:27017/migraine_prediction
 ML_SERVICE_URL=http://127.0.0.1:8000/predict
+HEADACHE_DIARY_ML_SERVICE_URL=http://127.0.0.1:8000/predict-headache-diary
+OPENAI_API_KEY=
+OPENAI_MODEL=gpt-4o-mini
 ```
+
+`OPENAI_API_KEY` is optional. If it is provided, the backend asks OpenAI to write a short non-diagnostic self-management note after each prediction. If it is not provided, the backend uses a safe rule-based explanation instead.
 
 ## Test routes
 
@@ -78,8 +83,15 @@ Sample JSON body:
 This route:
 - sends the input to the Python ML service
 - receives the prediction result
+- creates a short self-management explanation
 - saves the input and prediction to MongoDB
 - returns the saved prediction document as JSON
+
+### Backend and MongoDB health
+
+`GET http://127.0.0.1:5000/api/health`
+
+This route confirms whether the backend is running and whether MongoDB is configured and connected. It does not expose the MongoDB password or full connection string.
 
 ### Get all saved predictions
 

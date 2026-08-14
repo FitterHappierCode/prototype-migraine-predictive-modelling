@@ -267,6 +267,23 @@ input {
   font-size: 1.45rem;
 }
 
+.ai-explanation {
+  margin-top: 18px;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.ai-explanation strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.ai-explanation p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
 .model-note {
   margin: 20px 0 0;
   color: rgba(255, 255, 255, 0.82);

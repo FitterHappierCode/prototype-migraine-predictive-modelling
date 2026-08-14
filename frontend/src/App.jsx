@@ -365,6 +365,12 @@ function App() {
                         </strong>
                       </div>
                     </div>
+                    {lifestyleResult.ai_explanation ? (
+                      <div className="ai-explanation">
+                        <strong>Self-management note</strong>
+                        <p>{lifestyleResult.ai_explanation}</p>
+                      </div>
+                    ) : null}
                     <p className="model-note">
                       The model shows moderate predictive performance and should
                       be interpreted only as a risk-estimation prototype.
@@ -493,6 +499,12 @@ function App() {
                         <strong>{formatProbability(diaryResult.probability)}</strong>
                       </div>
                     </div>
+                    {diaryResult.ai_explanation ? (
+                      <div className="ai-explanation">
+                        <strong>Self-management note</strong>
+                        <p>{diaryResult.ai_explanation}</p>
+                      </div>
+                    ) : null}
                     <p className="model-note">
                       This model is trained on a separate published headache
                       diary dataset and should not be directly compared or merged
