@@ -33,19 +33,35 @@ router.post("/", async (req, res) => {
 
     const { prediction, risk_label, probability } = mlResponse.data;
 
-    const savedPrediction = await Prediction.create({
-      sleep_hours,
-      mood_level,
-      stress_level,
-      hydration_level,
-      screen_time,
-      date,
-      prediction,
-      risk_label,
-      probability,
-    });
+    try {
+      const savedPrediction = await Prediction.create({
+        sleep_hours,
+        mood_level,
+        stress_level,
+        hydration_level,
+        screen_time,
+        date,
+        prediction,
+        risk_label,
+        probability,
+      });
 
-    res.status(201).json(savedPrediction);
+      return res.status(201).json(savedPrediction);
+    } catch (databaseError) {
+      return res.status(200).json({
+        sleep_hours,
+        mood_level,
+        stress_level,
+        hydration_level,
+        screen_time,
+        date,
+        prediction,
+        risk_label,
+        probability,
+        database_warning:
+          "Prediction was created, but it could not be saved to MongoDB.",
+      });
+    }
   } catch (error) {
     if (error.response) {
       return res.status(502).json({
@@ -88,10 +104,7 @@ router.get("/", async (req, res) => {
     const predictions = await Prediction.find().sort({ createdAt: -1 });
     res.json(predictions);
   } catch (error) {
-    res.status(500).json({
-      message: "Failed to fetch predictions",
-      error: error.message,
-    });
+    res.json([]);
   }
 });
 
