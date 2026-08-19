@@ -82,6 +82,7 @@ const diaryGroups = [
 ];
 
 const diaryFields = diaryGroups.flatMap((group) => group.fields);
+const hormonalFieldNames = ["menstrual_phase", "ovulation_phase"];
 
 const initialLifestyleForm = {
   sleep_hours: 5,
@@ -168,9 +169,14 @@ function App() {
   }
 
   function handleDiarySexChange(event) {
+    const nextSexGender = event.target.value;
+
     setDiaryForm((current) => ({
       ...current,
-      sex_gender: event.target.value,
+      sex_gender: nextSexGender,
+      ...(nextSexGender === "female"
+        ? {}
+        : Object.fromEntries(hormonalFieldNames.map((name) => [name, 0]))),
     }));
   }
 
@@ -197,7 +203,7 @@ function App() {
     }
   }
 
-  async function handleDiarySubmit(event) {
+	  async function handleDiarySubmit(event) {
     event.preventDefault();
     setIsSubmittingDiary(true);
     setDiaryError("");
@@ -216,7 +222,11 @@ function App() {
       );
     } finally {
       setIsSubmittingDiary(false);
-    }
+	  }
+
+  const visibleDiaryGroups = diaryGroups.filter(
+    (group) => group.title !== "Hormonal Factors" || diaryForm.sex_gender === "female"
+  );
   }
 
   return (
@@ -485,31 +495,43 @@ function App() {
 
             <section className="layout">
               <section className="panel">
-                <h2>Select Diary Factors</h2>
-                <p className="muted-text form-note">
-                  Tick the factors that apply to the diary day being considered.
-                </p>
-                <form className="checkbox-form" onSubmit={handleDiarySubmit}>
-                  <label className="select-field">
-                    <span>Sex/Gender group</span>
-                    <small className="field-helper">
-                      Used as contextual information for subgroup analysis; the current deployed diary model does not use it as a prediction feature.
-                    </small>
-                    <select
-                      name="sex_gender"
+	                <h2>Select Diary Factors</h2>
+	                <p className="muted-text form-note">
+	                  Select the factors that apply to this diary day. The sections
+                    are grouped to make the form easier to complete and discuss
+                    clinically.
+	                </p>
+	                <form className="checkbox-form" onSubmit={handleDiarySubmit}>
+	                  <label className="select-field">
+	                    <span>Sex/Gender for diary context</span>
+	                    <small className="field-helper">
+	                      Used only to show relevant diary questions and for future
+                        subgroup analysis. It is not currently used as a model
+                        feature.
+	                    </small>
+	                    <select
+	                      name="sex_gender"
                       value={diaryForm.sex_gender}
                       onChange={handleDiarySexChange}
                     >
                       <option value="not_specified">Prefer not to specify / not recorded</option>
                       <option value="female">Female</option>
                       <option value="male">Male</option>
-                    </select>
-                  </label>
+	                    </select>
+	                  </label>
 
-                  {diaryGroups.map((group) => (
-                    <fieldset className="diary-group" key={group.title}>
-                      <legend>{group.title}</legend>
-                      <p>{group.description}</p>
+                    {diaryForm.sex_gender !== "female" ? (
+                      <div className="context-note">
+                        Hormonal diary questions are hidden unless Female is
+                        selected, because menstrual and ovulation factors are not
+                        applicable to all users.
+                      </div>
+                    ) : null}
+
+	                  {visibleDiaryGroups.map((group) => (
+	                    <fieldset className="diary-group" key={group.title}>
+	                      <legend>{group.title}</legend>
+	                      <p>{group.description}</p>
                       <div className="diary-group-grid">
                         {group.fields.map(([name, label]) => (
                           <label className="checkbox-field" key={name}>

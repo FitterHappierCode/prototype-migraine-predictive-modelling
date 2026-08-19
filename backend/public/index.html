@@ -122,21 +122,33 @@
         display: flex;
         flex-direction: column;
         gap: 7px;
-        padding: 14px;
-        border: 1px solid #d8e2ec;
+        padding: 16px;
+        border: 1px solid #bfd4e8;
+        border-radius: 18px;
+        background: linear-gradient(180deg, #f7fbff 0%, #eef7ff 100%);
+      }
+      .context-note {
+        grid-column: 1 / -1;
+        padding: 13px 15px;
+        border-left: 4px solid #2f7d8c;
         border-radius: 14px;
-        background: #f7fbff;
+        background: #edf8f7;
+        color: #315f68;
+        font-size: 0.92rem;
       }
       .diary-group {
         grid-column: 1 / -1;
         margin: 0;
-        padding: 16px;
+        padding: 18px;
         border: 1px solid #d8e2ec;
-        border-radius: 16px;
-        background: #fbfdff;
+        border-radius: 18px;
+        background: linear-gradient(180deg, #ffffff 0%, #f8fbfe 100%);
+        box-shadow: 0 10px 22px rgba(26, 54, 93, 0.05);
       }
       .diary-group legend {
-        padding: 0 8px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: #e9f3fb;
         color: #163a57;
         font-weight: 800;
       }
@@ -153,6 +165,11 @@
         width: 18px;
         height: 18px;
         accent-color: #1e7f79;
+      }
+      .checkbox-form label:has(input:checked) {
+        border-color: #1e7f79;
+        background: #edf8f7;
+        color: #174d4e;
       }
       form button {
         grid-column: 1 / -1;
@@ -272,13 +289,14 @@
         { title: "Other", description: "Other contextual factors recorded in the diary.", fields: [["travel", "Travel"], ["other_trigger", "Other trigger"]] }
       ];
       const diaryFields = diaryGroups.flatMap((group) => group.fields);
+      const hormonalFieldNames = ["menstrual_phase", "ovulation_phase"];
 
       const diaryForm = document.getElementById("diaryForm");
       const sexField = document.createElement("label");
       sexField.className = "select-field";
       sexField.innerHTML = `
-        <span>Sex/Gender group</span>
-        <small>Used as contextual information for subgroup analysis; the current deployed diary model does not use it as a prediction feature.</small>
+        <span>Sex/Gender for diary context</span>
+        <small>Used only to show relevant diary questions and for future subgroup analysis. It is not currently used as a model feature.</small>
         <select name="sex_gender">
           <option value="not_specified">Prefer not to specify / not recorded</option>
           <option value="female">Female</option>
@@ -286,10 +304,16 @@
         </select>
       `;
       diaryForm.appendChild(sexField);
+      const sexSelect = sexField.querySelector("select");
+      const contextNote = document.createElement("div");
+      contextNote.className = "context-note";
+      contextNote.textContent = "Hormonal diary questions are hidden unless Female is selected, because menstrual and ovulation factors are not applicable to all users.";
+      diaryForm.appendChild(contextNote);
 
       diaryGroups.forEach((group) => {
         const fieldset = document.createElement("fieldset");
         fieldset.className = "diary-group";
+        fieldset.dataset.groupTitle = group.title;
         fieldset.innerHTML = `<legend>${group.title}</legend><p>${group.description}</p><div class="diary-group-grid"></div>`;
         const grid = fieldset.querySelector(".diary-group-grid");
         group.fields.forEach(([name, label]) => {
@@ -299,6 +323,24 @@
         });
         diaryForm.appendChild(fieldset);
       });
+
+      function updateHormonalVisibility() {
+        const shouldShowHormonal = sexSelect.value === "female";
+        const hormonalGroup = diaryForm.querySelector('[data-group-title="Hormonal Factors"]');
+        if (hormonalGroup) {
+          hormonalGroup.classList.toggle("hidden", !shouldShowHormonal);
+        }
+        contextNote.classList.toggle("hidden", shouldShowHormonal);
+        if (!shouldShowHormonal) {
+          hormonalFieldNames.forEach((name) => {
+            const checkbox = diaryForm.elements[name];
+            if (checkbox) checkbox.checked = false;
+          });
+        }
+      }
+
+      sexSelect.addEventListener("change", updateHormonalVisibility);
+      updateHormonalVisibility();
       const diaryButton = document.createElement("button");
       diaryButton.type = "submit";
       diaryButton.textContent = "Predict Headache Risk";

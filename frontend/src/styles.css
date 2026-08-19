@@ -203,24 +203,36 @@ select {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 14px;
-  border: 1px solid #d8e2ec;
-  border-radius: 16px;
-  background: #f7fbff;
+  padding: 16px;
+  border: 1px solid #bfd4e8;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #f7fbff 0%, #eef7ff 100%);
   color: #2a3d54;
   font-weight: 700;
 }
 
+.context-note {
+  padding: 13px 15px;
+  border-left: 4px solid #2f7d8c;
+  border-radius: 14px;
+  background: #edf8f7;
+  color: #315f68;
+  font-size: 0.92rem;
+}
+
 .diary-group {
   margin: 0;
-  padding: 16px;
+  padding: 18px;
   border: 1px solid #d8e2ec;
-  border-radius: 16px;
-  background: #fbfdff;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbfe 100%);
+  box-shadow: 0 10px 22px rgba(26, 54, 93, 0.05);
 }
 
 .diary-group legend {
-  padding: 0 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #e9f3fb;
   color: #163a57;
   font-weight: 800;
 }
@@ -245,6 +257,22 @@ select {
   border: 1px solid #d8e2ec;
   border-radius: 14px;
   background: #fbfdff;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.checkbox-field:hover {
+  border-color: #9fc1df;
+  background: #f2f8ff;
+  transform: translateY(-1px);
+}
+
+.checkbox-field:has(input:checked) {
+  border-color: #1e7f79;
+  background: #edf8f7;
+  color: #174d4e;
 }
 
 .checkbox-field input {
