@@ -49,6 +49,8 @@ OPENAI_MODEL=gpt-4o-mini
 
 `OPENAI_API_KEY` is optional. If it is provided, the backend asks OpenAI to write a short non-diagnostic self-management note after each prediction. If it is not provided, the backend uses a safe rule-based explanation instead.
 
+The headache diary demo groups trigger inputs into medication, sleep/fatigue, stress/emotional, environmental, diet/substance, activity, hormonal and other factors. The sex/gender field is currently used as contextual information for future subgroup analysis and is not used as a deployed model feature.
+
 ## Test routes
 
 ### Health check

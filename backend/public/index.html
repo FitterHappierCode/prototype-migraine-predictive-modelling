@@ -101,7 +101,7 @@
         color: #65798f;
         font-weight: 500;
       }
-      input[type="number"], input[type="date"] {
+      input[type="number"], input[type="date"], select {
         width: 100%;
         padding: 13px 14px;
         border: 1px solid #c9d4e0;
@@ -117,6 +117,37 @@
         border: 1px solid #d8e2ec;
         border-radius: 14px;
         background: #fbfdff;
+      }
+      .select-field {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        padding: 14px;
+        border: 1px solid #d8e2ec;
+        border-radius: 14px;
+        background: #f7fbff;
+      }
+      .diary-group {
+        grid-column: 1 / -1;
+        margin: 0;
+        padding: 16px;
+        border: 1px solid #d8e2ec;
+        border-radius: 16px;
+        background: #fbfdff;
+      }
+      .diary-group legend {
+        padding: 0 8px;
+        color: #163a57;
+        font-weight: 800;
+      }
+      .diary-group p {
+        margin: 0 0 12px;
+        color: #65798f;
+      }
+      .diary-group-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
       }
       input[type="checkbox"] {
         width: 18px;
@@ -230,23 +261,43 @@
       const today = new Date().toISOString().split("T")[0];
       document.querySelector('input[name="date"]').value = today;
 
-      const diaryFields = [
-        ["preventive_medication_use", "Preventive medication used"], ["stress", "Stress"], ["excess_sleep", "Excess sleep"],
-        ["sleep_deprivation", "Sleep deprivation"], ["physical_fatigue", "Physical fatigue"], ["weather_temperature_change", "Weather/temperature change"],
-        ["excessive_sunlight", "Excessive sunlight"], ["noise", "Noise"], ["inappropriate_lighting", "Inappropriate lighting"],
-        ["specific_smell", "Specific smell trigger"], ["excess_alcohol", "Excess alcohol"], ["irregular_meals", "Irregular meals / fasting"],
-        ["overeating", "Overeating"], ["excess_caffeine", "Excess caffeine drinks"], ["excess_smoking", "Excess smoking"],
-        ["cheese_chocolate", "Cheese or chocolate"], ["travel", "Travel"], ["other_trigger", "Other trigger"],
-        ["emotional_change", "Strong emotional change"], ["exercise_trigger", "Exercise as trigger"], ["no_exercise", "No exercise"],
-        ["exercise_status", "Exercise done today"], ["vigorous_exercise", "Vigorous exercise"], ["moderate_exercise", "Moderate exercise"],
-        ["menstrual_phase", "Menstrual phase"], ["ovulation_phase", "Ovulation phase"]
+      const diaryGroups = [
+        { title: "Medication", description: "Treatment-related information recorded for the diary day.", fields: [["preventive_medication_use", "Preventive medication used"]] },
+        { title: "Sleep and Fatigue", description: "Sleep pattern and tiredness factors that may relate to headache risk.", fields: [["excess_sleep", "Excess sleep"], ["sleep_deprivation", "Sleep deprivation"], ["physical_fatigue", "Physical fatigue"]] },
+        { title: "Stress and Emotional Factors", description: "Psychological or emotional factors reported in the diary.", fields: [["stress", "Stress"], ["emotional_change", "Strong emotional change"]] },
+        { title: "Environmental Triggers", description: "External surroundings that may contribute to headache symptoms.", fields: [["weather_temperature_change", "Weather/temperature change"], ["excessive_sunlight", "Excessive sunlight"], ["noise", "Noise"], ["inappropriate_lighting", "Inappropriate lighting"], ["specific_smell", "Specific smell trigger"]] },
+        { title: "Diet and Substances", description: "Food, drink and substance-related diary factors.", fields: [["excess_alcohol", "Excess alcohol"], ["irregular_meals", "Irregular meals / fasting"], ["overeating", "Overeating"], ["excess_caffeine", "Excess caffeine drinks"], ["excess_smoking", "Excess smoking"], ["cheese_chocolate", "Cheese or chocolate"]] },
+        { title: "Activity", description: "Exercise and movement-related factors.", fields: [["exercise_trigger", "Exercise as trigger"], ["no_exercise", "No exercise"], ["exercise_status", "Exercise done today"], ["vigorous_exercise", "Vigorous exercise"], ["moderate_exercise", "Moderate exercise"]] },
+        { title: "Hormonal Factors", description: "Relevant for users who track menstrual or ovulation-related patterns.", fields: [["menstrual_phase", "Menstrual phase"], ["ovulation_phase", "Ovulation phase"]] },
+        { title: "Other", description: "Other contextual factors recorded in the diary.", fields: [["travel", "Travel"], ["other_trigger", "Other trigger"]] }
       ];
+      const diaryFields = diaryGroups.flatMap((group) => group.fields);
 
       const diaryForm = document.getElementById("diaryForm");
-      diaryFields.forEach(([name, label]) => {
-        const field = document.createElement("label");
-        field.innerHTML = `<input type="checkbox" name="${name}" /> <span>${label}</span>`;
-        diaryForm.appendChild(field);
+      const sexField = document.createElement("label");
+      sexField.className = "select-field";
+      sexField.innerHTML = `
+        <span>Sex/Gender group</span>
+        <small>Used as contextual information for subgroup analysis; the current deployed diary model does not use it as a prediction feature.</small>
+        <select name="sex_gender">
+          <option value="not_specified">Prefer not to specify / not recorded</option>
+          <option value="female">Female</option>
+          <option value="male">Male</option>
+        </select>
+      `;
+      diaryForm.appendChild(sexField);
+
+      diaryGroups.forEach((group) => {
+        const fieldset = document.createElement("fieldset");
+        fieldset.className = "diary-group";
+        fieldset.innerHTML = `<legend>${group.title}</legend><p>${group.description}</p><div class="diary-group-grid"></div>`;
+        const grid = fieldset.querySelector(".diary-group-grid");
+        group.fields.forEach(([name, label]) => {
+          const field = document.createElement("label");
+          field.innerHTML = `<input type="checkbox" name="${name}" /> <span>${label}</span>`;
+          grid.appendChild(field);
+        });
+        diaryForm.appendChild(fieldset);
       });
       const diaryButton = document.createElement("button");
       diaryButton.type = "submit";

@@ -70,6 +70,11 @@ function getDiarySignals(input) {
     .map(([, label]) => label);
 }
 
+function getMlDiaryPayload(input) {
+  const { sex_gender, ...mlPayload } = input;
+  return mlPayload;
+}
+
 function getFallbackExplanation({ modelType, riskLabel, probability, signals }) {
   const probabilityPercent = Math.round(Number(probability) * 100);
 
@@ -247,7 +252,8 @@ router.post("/", async (req, res) => {
 // Send headache diary trigger inputs to the second Python ML model.
 router.post("/headache-diary", async (req, res) => {
   try {
-    const mlResponse = await axios.post(headacheDiaryMlServiceUrl, req.body);
+    const mlPayload = getMlDiaryPayload(req.body);
+    const mlResponse = await axios.post(headacheDiaryMlServiceUrl, mlPayload);
     const { risk_label, probability } = mlResponse.data;
     const explanation = await generateExplanation({
       modelType: "diary",

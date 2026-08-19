@@ -19,7 +19,8 @@ body {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -160,7 +161,8 @@ input {
   line-height: 1.4;
 }
 
-.prediction-form input {
+.prediction-form input,
+.select-field select {
   padding: 12px 14px;
   border: 1px solid #c9d4e0;
   border-radius: 12px;
@@ -168,7 +170,8 @@ input {
   color: #122033;
 }
 
-.prediction-form input:focus {
+.prediction-form input:focus,
+.select-field select:focus {
   outline: 2px solid #3f7db6;
   outline-offset: 2px;
 }
@@ -192,6 +195,43 @@ input {
 }
 
 .checkbox-form {
+  display: grid;
+  gap: 16px;
+}
+
+.select-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid #d8e2ec;
+  border-radius: 16px;
+  background: #f7fbff;
+  color: #2a3d54;
+  font-weight: 700;
+}
+
+.diary-group {
+  margin: 0;
+  padding: 16px;
+  border: 1px solid #d8e2ec;
+  border-radius: 16px;
+  background: #fbfdff;
+}
+
+.diary-group legend {
+  padding: 0 8px;
+  color: #163a57;
+  font-weight: 800;
+}
+
+.diary-group p {
+  margin: 0 0 12px;
+  color: #62778d;
+  font-size: 0.9rem;
+}
+
+.diary-group-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;

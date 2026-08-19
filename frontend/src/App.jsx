@@ -6,6 +6,83 @@ const apiBaseUrl =
 
 const todayDate = new Date().toISOString().split("T")[0];
 
+const diaryGroups = [
+  {
+    title: "Medication",
+    description: "Treatment-related information recorded for the diary day.",
+    fields: [["preventive_medication_use", "Preventive medication used"]],
+  },
+  {
+    title: "Sleep and Fatigue",
+    description: "Sleep pattern and tiredness factors that may relate to headache risk.",
+    fields: [
+      ["excess_sleep", "Excess sleep"],
+      ["sleep_deprivation", "Sleep deprivation"],
+      ["physical_fatigue", "Physical fatigue"],
+    ],
+  },
+  {
+    title: "Stress and Emotional Factors",
+    description: "Psychological or emotional factors reported in the diary.",
+    fields: [
+      ["stress", "Stress"],
+      ["emotional_change", "Strong emotional change"],
+    ],
+  },
+  {
+    title: "Environmental Triggers",
+    description: "External surroundings that may contribute to headache symptoms.",
+    fields: [
+      ["weather_temperature_change", "Weather/temperature change"],
+      ["excessive_sunlight", "Excessive sunlight"],
+      ["noise", "Noise"],
+      ["inappropriate_lighting", "Inappropriate lighting"],
+      ["specific_smell", "Specific smell trigger"],
+    ],
+  },
+  {
+    title: "Diet and Substances",
+    description: "Food, drink and substance-related diary factors.",
+    fields: [
+      ["excess_alcohol", "Excess alcohol"],
+      ["irregular_meals", "Irregular meals / fasting"],
+      ["overeating", "Overeating"],
+      ["excess_caffeine", "Excess caffeine drinks"],
+      ["excess_smoking", "Excess smoking"],
+      ["cheese_chocolate", "Cheese or chocolate"],
+    ],
+  },
+  {
+    title: "Activity",
+    description: "Exercise and movement-related factors.",
+    fields: [
+      ["exercise_trigger", "Exercise as trigger"],
+      ["no_exercise", "No exercise"],
+      ["exercise_status", "Exercise done today"],
+      ["vigorous_exercise", "Vigorous exercise"],
+      ["moderate_exercise", "Moderate exercise"],
+    ],
+  },
+  {
+    title: "Hormonal Factors",
+    description: "Relevant for users who track menstrual or ovulation-related patterns.",
+    fields: [
+      ["menstrual_phase", "Menstrual phase"],
+      ["ovulation_phase", "Ovulation phase"],
+    ],
+  },
+  {
+    title: "Other",
+    description: "Other contextual factors recorded in the diary.",
+    fields: [
+      ["travel", "Travel"],
+      ["other_trigger", "Other trigger"],
+    ],
+  },
+];
+
+const diaryFields = diaryGroups.flatMap((group) => group.fields);
+
 const initialLifestyleForm = {
   sleep_hours: 5,
   mood_level: 5,
@@ -16,62 +93,9 @@ const initialLifestyleForm = {
 };
 
 const initialDiaryForm = {
-  preventive_medication_use: 0,
-  stress: 0,
-  excess_sleep: 0,
-  sleep_deprivation: 0,
-  exercise_trigger: 0,
-  no_exercise: 0,
-  physical_fatigue: 0,
-  menstrual_phase: 0,
-  ovulation_phase: 0,
-  emotional_change: 0,
-  weather_temperature_change: 0,
-  excessive_sunlight: 0,
-  noise: 0,
-  inappropriate_lighting: 0,
-  specific_smell: 0,
-  excess_alcohol: 0,
-  irregular_meals: 0,
-  overeating: 0,
-  excess_caffeine: 0,
-  excess_smoking: 0,
-  cheese_chocolate: 0,
-  travel: 0,
-  other_trigger: 0,
-  exercise_status: 0,
-  vigorous_exercise: 0,
-  moderate_exercise: 0,
+  sex_gender: "not_specified",
+  ...Object.fromEntries(diaryFields.map(([name]) => [name, 0])),
 };
-
-const diaryFields = [
-  ["preventive_medication_use", "Preventive medication used"],
-  ["stress", "Stress"],
-  ["excess_sleep", "Excess sleep"],
-  ["sleep_deprivation", "Sleep deprivation"],
-  ["physical_fatigue", "Physical fatigue"],
-  ["weather_temperature_change", "Weather/temperature change"],
-  ["excessive_sunlight", "Excessive sunlight"],
-  ["noise", "Noise"],
-  ["inappropriate_lighting", "Inappropriate lighting"],
-  ["specific_smell", "Specific smell trigger"],
-  ["excess_alcohol", "Excess alcohol"],
-  ["irregular_meals", "Irregular meals / fasting"],
-  ["overeating", "Overeating"],
-  ["excess_caffeine", "Excess caffeine drinks"],
-  ["excess_smoking", "Excess smoking"],
-  ["cheese_chocolate", "Cheese or chocolate"],
-  ["travel", "Travel"],
-  ["other_trigger", "Other trigger"],
-  ["emotional_change", "Strong emotional change"],
-  ["exercise_trigger", "Exercise as trigger"],
-  ["no_exercise", "No exercise"],
-  ["exercise_status", "Exercise done today"],
-  ["vigorous_exercise", "Vigorous exercise"],
-  ["moderate_exercise", "Moderate exercise"],
-  ["menstrual_phase", "Menstrual phase"],
-  ["ovulation_phase", "Ovulation phase"],
-];
 
 function formatProbability(probability) {
   if (probability === null || probability === undefined) {
@@ -140,6 +164,13 @@ function App() {
     setDiaryForm((current) => ({
       ...current,
       [name]: checked ? 1 : 0,
+    }));
+  }
+
+  function handleDiarySexChange(event) {
+    setDiaryForm((current) => ({
+      ...current,
+      sex_gender: event.target.value,
     }));
   }
 
@@ -459,16 +490,40 @@ function App() {
                   Tick the factors that apply to the diary day being considered.
                 </p>
                 <form className="checkbox-form" onSubmit={handleDiarySubmit}>
-                  {diaryFields.map(([name, label]) => (
-                    <label className="checkbox-field" key={name}>
-                      <input
-                        type="checkbox"
-                        name={name}
-                        checked={diaryForm[name] === 1}
-                        onChange={handleDiaryCheckboxChange}
-                      />
-                      <span>{label}</span>
-                    </label>
+                  <label className="select-field">
+                    <span>Sex/Gender group</span>
+                    <small className="field-helper">
+                      Used as contextual information for subgroup analysis; the current deployed diary model does not use it as a prediction feature.
+                    </small>
+                    <select
+                      name="sex_gender"
+                      value={diaryForm.sex_gender}
+                      onChange={handleDiarySexChange}
+                    >
+                      <option value="not_specified">Prefer not to specify / not recorded</option>
+                      <option value="female">Female</option>
+                      <option value="male">Male</option>
+                    </select>
+                  </label>
+
+                  {diaryGroups.map((group) => (
+                    <fieldset className="diary-group" key={group.title}>
+                      <legend>{group.title}</legend>
+                      <p>{group.description}</p>
+                      <div className="diary-group-grid">
+                        {group.fields.map(([name, label]) => (
+                          <label className="checkbox-field" key={name}>
+                            <input
+                              type="checkbox"
+                              name={name}
+                              checked={diaryForm[name] === 1}
+                              onChange={handleDiaryCheckboxChange}
+                            />
+                            <span>{label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </fieldset>
                   ))}
 
                   <button type="submit" disabled={isSubmittingDiary}>
