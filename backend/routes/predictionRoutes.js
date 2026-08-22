@@ -146,7 +146,10 @@ async function generateExplanation({ modelType, input, riskLabel, probability, s
     });
 
     if (!response.ok) {
-      throw new Error(`OpenAI request failed with status ${response.status}`);
+      const errorBody = await response.text();
+      throw new Error(
+        `OpenAI request failed with status ${response.status}: ${errorBody}`
+      );
     }
 
     const data = await response.json();
@@ -157,6 +160,8 @@ async function generateExplanation({ modelType, input, riskLabel, probability, s
       explanation_source: aiText ? "openai" : "rule_based",
     };
   } catch (error) {
+    console.warn("OpenAI explanation failed; using rule-based fallback:", error.message);
+
     return {
       ai_explanation: fallbackExplanation,
       explanation_source: "rule_based",
