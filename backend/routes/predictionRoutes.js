@@ -75,20 +75,74 @@ function getMlDiaryPayload(input) {
   return mlPayload;
 }
 
+function getSurfaceSuggestions({ modelType, signals }) {
+  const suggestions = [];
+
+  if (signals.some((signal) => signal.includes("sleep"))) {
+    suggestions.push("keeping a steadier sleep routine");
+  }
+
+  if (signals.some((signal) => signal.includes("stress"))) {
+    suggestions.push("noting stress patterns and taking short breaks");
+  }
+
+  if (signals.some((signal) => signal.includes("hydration"))) {
+    suggestions.push("checking hydration across the day");
+  }
+
+  if (signals.some((signal) => signal.includes("screen"))) {
+    suggestions.push("taking breaks from prolonged screen use");
+  }
+
+  if (
+    modelType === "diary" &&
+    signals.some((signal) =>
+      ["caffeine", "alcohol", "meals", "cheese", "chocolate"].some((term) =>
+        signal.includes(term)
+      )
+    )
+  ) {
+    suggestions.push("recording food and drink patterns in the diary");
+  }
+
+  if (
+    modelType === "diary" &&
+    signals.some((signal) =>
+      ["noise", "light", "sunlight", "smell", "weather"].some((term) =>
+        signal.includes(term)
+      )
+    )
+  ) {
+    suggestions.push("tracking environmental triggers over time");
+  }
+
+  if (suggestions.length === 0) {
+    suggestions.push(
+      modelType === "diary"
+        ? "continuing to record diary factors consistently"
+        : "continuing to monitor lifestyle patterns consistently"
+    );
+  }
+
+  return suggestions.slice(0, 2);
+}
+
 function getFallbackExplanation({ modelType, riskLabel, probability, signals }) {
   const probabilityPercent = Math.round(Number(probability) * 100);
+  const suggestions = getSurfaceSuggestions({ modelType, signals });
+  const suggestionText = suggestions.join(" and ");
 
   if (signals.length === 0) {
-    return `The model estimated ${riskLabel.toLowerCase()} with a probability of ${probabilityPercent}%. No single input stands out strongly, so this should be interpreted as a general risk estimate rather than a diagnosis.`;
+    return `The model estimated ${riskLabel.toLowerCase()} with a probability of ${probabilityPercent}%. No single input stands out strongly, so this is not a diagnosis; consider ${suggestionText}.`;
   }
 
   const factorText = signals.slice(0, 3).join(", ");
   const focusText =
     modelType === "diary"
-      ? "These diary factors may be useful to monitor when reviewing future headache patterns."
-      : "These lifestyle factors may be useful to monitor when reviewing future migraine risk.";
+      ? "These diary factors may be useful to monitor when reviewing future headache patterns"
+      : "These lifestyle factors may be useful to monitor when reviewing future migraine risk";
 
-  return `The model estimated ${riskLabel.toLowerCase()} with a probability of ${probabilityPercent}%. The main factors to reflect on are: ${factorText}. ${focusText}`;
+  return `The model estimated ${riskLabel.toLowerCase()} with a probability of ${probabilityPercent}%. The main factors to reflect on are: ${factorText}. ${focusText}; consider ${suggestionText}. This is not a diagnosis.`;
 }
 
 function extractOpenAiText(data) {
@@ -110,6 +164,7 @@ async function generateExplanation({ modelType, input, riskLabel, probability, s
     probability,
     signals,
   });
+  const suggestions = getSurfaceSuggestions({ modelType, signals });
 
   if (!openAiApiKey) {
     return {
@@ -132,13 +187,13 @@ async function generateExplanation({ modelType, input, riskLabel, probability, s
       body: JSON.stringify({
         model: openAiModel,
         instructions:
-          "You write brief, cautious, non-diagnostic self-management explanations for a headache risk prototype. Do not give medical advice, treatment instructions, or certainty. Use 2 short sentences. Include that the output is not a diagnosis.",
+          "You write brief, cautious, non-diagnostic self-management notes for a headache risk prototype. Use 2 short sentences. Mention the main factors, include one gentle surface-level suggestion using words like 'consider' or 'monitor', and clearly state that this is not a diagnosis. Do not recommend medication, treatment, or urgent action.",
         input: JSON.stringify({
           model_type: modelType,
           risk_label: riskLabel,
           probability,
           notable_factors: signals,
-          user_input: input,
+          surface_level_suggestions: suggestions,
         }),
         max_output_tokens: 110,
         temperature: 0.2,
