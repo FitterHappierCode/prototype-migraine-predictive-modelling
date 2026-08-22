@@ -203,7 +203,7 @@ function App() {
     }
   }
 
-	  async function handleDiarySubmit(event) {
+  async function handleDiarySubmit(event) {
     event.preventDefault();
     setIsSubmittingDiary(true);
     setDiaryError("");
@@ -222,51 +222,96 @@ function App() {
       );
     } finally {
       setIsSubmittingDiary(false);
-	  }
+    }
+  }
 
   const visibleDiaryGroups = diaryGroups.filter(
-    (group) => group.title !== "Hormonal Factors" || diaryForm.sex_gender === "female"
+    (group) =>
+      group.title !== "Hormonal Factors" || diaryForm.sex_gender === "female"
   );
-  }
 
   return (
     <div className="app-shell">
       <main className="page">
         <header className="hero">
-          <p className="eyebrow">MSc AI Project Demo</p>
-          <h1>Migraine and Headache Risk Prediction Prototype</h1>
-          <p className="intro">
-            This web-based prototype demonstrates two separate machine-learning
-            models: a lifestyle-based migraine occurrence model and a headache
-            diary trigger model. The models are trained on different datasets and
-            should be interpreted independently.
-          </p>
-          <div className="disclaimer">
-            This prototype is for educational and research purposes only. It is
-            not a medical diagnosis tool.
+          <div className="hero-copy">
+            <p className="eyebrow">MSc Artificial Intelligence Project</p>
+            <h1>Migraine and Headache Risk Prediction Prototype</h1>
+            <p className="intro">
+              A web-based digital health prototype that combines machine-learning
+              risk estimation with clear, non-diagnostic self-management wording.
+            </p>
+            <div className="disclaimer">
+              This prototype is for educational and research purposes only. It is
+              not a medical diagnosis tool.
+            </div>
           </div>
+
+          <aside className="hero-card" aria-label="Prototype summary">
+            <span className="status-pill">Live prototype</span>
+            <h2>Two-model demo</h2>
+            <p>
+              Lifestyle inputs and headache diary triggers are handled as
+              separate prediction pathways for clearer interpretation.
+            </p>
+            <div className="hero-card-grid">
+              <div>
+                <strong>2</strong>
+                <span>ML models</span>
+              </div>
+              <div>
+                <strong>API</strong>
+                <span>connected</span>
+              </div>
+            </div>
+          </aside>
         </header>
 
-        <nav className="model-tabs" aria-label="Prediction model tabs">
-          <button
-            className={activeTab === "lifestyle" ? "active" : ""}
-            type="button"
-            onClick={() => setActiveTab("lifestyle")}
-          >
-            Lifestyle Migraine Risk
-          </button>
-          <button
-            className={activeTab === "diary" ? "active" : ""}
-            type="button"
-            onClick={() => setActiveTab("diary")}
-          >
-            Headache Diary Risk
-          </button>
-        </nav>
+        <section className="summary-grid" aria-label="Prototype highlights">
+          <article>
+            <span>Model 1</span>
+            <strong>Lifestyle risk</strong>
+            <p>Sleep, mood, stress, hydration, screen time and date features.</p>
+          </article>
+          <article>
+            <span>Model 2</span>
+            <strong>Diary trigger risk</strong>
+            <p>Grouped headache diary factors from a separate published dataset.</p>
+          </article>
+          <article>
+            <span>Output</span>
+            <strong>Risk estimate</strong>
+            <p>Prediction, probability, and cautious explanatory wording.</p>
+          </article>
+        </section>
+
+        <div className="tabs-wrap">
+          <div>
+            <p className="section-kicker">Choose prediction pathway</p>
+            <h2>Prediction workspace</h2>
+          </div>
+          <nav className="model-tabs" aria-label="Prediction model tabs">
+            <button
+              className={activeTab === "lifestyle" ? "active" : ""}
+              type="button"
+              onClick={() => setActiveTab("lifestyle")}
+            >
+              Lifestyle model
+            </button>
+            <button
+              className={activeTab === "diary" ? "active" : ""}
+              type="button"
+              onClick={() => setActiveTab("diary")}
+            >
+              Diary model
+            </button>
+          </nav>
+        </div>
 
         {activeTab === "lifestyle" ? (
           <>
             <section className="model-context panel soft-panel">
+              <p className="section-kicker">Model overview</p>
               <h2>Lifestyle-Based Migraine Occurrence Model</h2>
               <p>
                 This model uses the original lifestyle dataset and estimates the
@@ -276,8 +321,14 @@ function App() {
             </section>
 
             <section className="layout">
-              <section className="panel">
-                <h2>Enter Lifestyle Information</h2>
+              <section className="panel form-panel">
+                <div className="panel-heading">
+                  <div>
+                    <p className="section-kicker">Input form</p>
+                    <h2>Enter Lifestyle Information</h2>
+                  </div>
+                  <span className="panel-tag">Daily record</span>
+                </div>
                 <form className="prediction-form" onSubmit={handleLifestyleSubmit}>
                   <label>
                     <span>Sleep Hours</span>
@@ -383,7 +434,12 @@ function App() {
               </section>
 
               <section className="panel result-panel">
-                <h2>Prediction Result</h2>
+                <div className="panel-heading">
+                  <div>
+                    <p className="section-kicker">Model output</p>
+                    <h2>Prediction Result</h2>
+                  </div>
+                </div>
                 {lifestyleResult ? (
                   <div className="result-card">
                     <div className="result-badge">
@@ -422,9 +478,13 @@ function App() {
                     </p>
                   </div>
                 ) : (
-                  <p className="muted-text">
-                    Submit the form to see the latest migraine risk prediction.
-                  </p>
+                  <div className="empty-state">
+                    <span>Awaiting input</span>
+                    <p>
+                      Submit the lifestyle form to see the latest migraine risk
+                      estimate.
+                    </p>
+                  </div>
                 )}
               </section>
             </section>
@@ -484,6 +544,7 @@ function App() {
         ) : (
           <>
             <section className="model-context panel soft-panel">
+              <p className="section-kicker">Model overview</p>
               <h2>Headache Diary Trigger Model</h2>
               <p>
                 This second model uses a separate published smartphone headache
@@ -498,31 +559,37 @@ function App() {
             </section>
 
             <section className="layout">
-              <section className="panel">
-	                <h2>Select Diary Factors</h2>
-	                <p className="muted-text form-note">
-	                  Select the factors that apply to this diary day. The sections
+              <section className="panel form-panel">
+                <div className="panel-heading">
+                  <div>
+                    <p className="section-kicker">Input form</p>
+                    <h2>Select Diary Factors</h2>
+                  </div>
+                  <span className="panel-tag">Trigger diary</span>
+                </div>
+                <p className="muted-text form-note">
+                  Select the factors that apply to this diary day. The sections
                     are grouped to make the form easier to complete and discuss
                     clinically.
-	                </p>
-	                <form className="checkbox-form" onSubmit={handleDiarySubmit}>
-	                  <label className="select-field">
-	                    <span>Sex/Gender for diary context</span>
-	                    <small className="field-helper">
-	                      Used only to show relevant diary questions and for future
+                </p>
+                <form className="checkbox-form" onSubmit={handleDiarySubmit}>
+                  <label className="select-field">
+                    <span>Sex/Gender for diary context</span>
+                    <small className="field-helper">
+                      Used only to show relevant diary questions and for future
                         subgroup analysis. It is not currently used as a model
                         feature.
-	                    </small>
-	                    <select
-	                      name="sex_gender"
+                    </small>
+                    <select
+                      name="sex_gender"
                       value={diaryForm.sex_gender}
                       onChange={handleDiarySexChange}
                     >
                       <option value="not_specified">Prefer not to specify / not recorded</option>
                       <option value="female">Female</option>
                       <option value="male">Male</option>
-	                    </select>
-	                  </label>
+                    </select>
+                  </label>
 
                     {diaryForm.sex_gender !== "female" ? (
                       <div className="context-note">
@@ -532,10 +599,10 @@ function App() {
                       </div>
                     ) : null}
 
-	                  {visibleDiaryGroups.map((group) => (
-	                    <fieldset className="diary-group" key={group.title}>
-	                      <legend>{group.title}</legend>
-	                      <p>{group.description}</p>
+                  {visibleDiaryGroups.map((group) => (
+                    <fieldset className="diary-group" key={group.title}>
+                      <legend>{group.title}</legend>
+                      <p>{group.description}</p>
                       <div className="diary-group-grid">
                         {group.fields.map(([name, label]) => (
                           <label className="checkbox-field" key={name}>
@@ -561,7 +628,12 @@ function App() {
               </section>
 
               <section className="panel result-panel">
-                <h2>Headache Diary Result</h2>
+                <div className="panel-heading">
+                  <div>
+                    <p className="section-kicker">Model output</p>
+                    <h2>Headache Diary Result</h2>
+                  </div>
+                </div>
                 {diaryResult ? (
                   <div className="result-card diary-card">
                     <div className="result-badge">{diaryResult.risk_label}</div>
@@ -597,10 +669,13 @@ function App() {
                     </p>
                   </div>
                 ) : (
-                  <p className="muted-text">
-                    Submit the diary factors to see the headache day risk
-                    estimate.
-                  </p>
+                  <div className="empty-state">
+                    <span>Awaiting input</span>
+                    <p>
+                      Submit the diary factors to see the headache day risk
+                      estimate.
+                    </p>
+                  </div>
                 )}
               </section>
             </section>
