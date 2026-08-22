@@ -367,7 +367,7 @@
       }
       function resultHtml(data, text) {
         const explanation = data.ai_explanation
-          ? `<div class="explanation"><strong>Self-management note</strong>${escapeHtml(data.ai_explanation)}</div>`
+          ? `<div class="explanation"><strong>${data.explanation_source === "openai" ? "AI-assisted self-management note" : "Self-management note"}</strong>${escapeHtml(data.ai_explanation)}</div>`
           : "";
         return `<div class="result-card"><div class="badge">${escapeHtml(data.risk_label)}</div><h3>${escapeHtml(text)}</h3><p><strong>Probability:</strong> ${pct(data.probability)}</p>${explanation}<p>This is a risk-estimation prototype and not a diagnostic output.</p></div>`;
       }

@@ -408,7 +408,11 @@ function App() {
                     </div>
                     {lifestyleResult.ai_explanation ? (
                       <div className="ai-explanation">
-                        <strong>Self-management note</strong>
+                        <strong>
+                          {lifestyleResult.explanation_source === "openai"
+                            ? "AI-assisted self-management note"
+                            : "Self-management note"}
+                        </strong>
                         <p>{lifestyleResult.ai_explanation}</p>
                       </div>
                     ) : null}
@@ -578,7 +582,11 @@ function App() {
                     </div>
                     {diaryResult.ai_explanation ? (
                       <div className="ai-explanation">
-                        <strong>Self-management note</strong>
+                        <strong>
+                          {diaryResult.explanation_source === "openai"
+                            ? "AI-assisted self-management note"
+                            : "Self-management note"}
+                        </strong>
                         <p>{diaryResult.ai_explanation}</p>
                       </div>
                     ) : null}

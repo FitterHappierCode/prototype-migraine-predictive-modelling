@@ -11,6 +11,8 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 5000;
 const mongoUri = process.env.MONGO_URI;
+const openAiApiKey = process.env.OPENAI_API_KEY;
+const openAiModel = process.env.OPENAI_MODEL || "gpt-4o-mini";
 
 const mongoStateLabels = {
   0: "disconnected",
@@ -62,6 +64,10 @@ app.get("/api/health", (req, res) => {
       state_label: mongoStateLabels[state] || "unknown",
       database: mongoose.connection.name || null,
       host: mongoose.connection.host || null,
+    },
+    openai: {
+      configured: Boolean(openAiApiKey),
+      model: openAiModel,
     },
   });
 });
