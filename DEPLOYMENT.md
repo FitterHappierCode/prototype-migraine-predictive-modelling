@@ -76,9 +76,14 @@ Set these environment variables in Render:
 PORT=10000
 MONGO_URI=your_mongodb_atlas_connection_string
 ML_SERVICE_URL=https://your-ml-service.onrender.com/predict
+HEADACHE_DIARY_ML_SERVICE_URL=https://your-ml-service.onrender.com/predict-headache-diary
+OPENAI_API_KEY=your_openai_api_key
+OPENAI_MODEL=gpt-4o-mini
 ```
 
 After deployment, note the public backend URL.
+
+The OpenAI key is used only by the backend to generate short non-diagnostic explanation text. The trained ML models still produce the prediction and probability. If the key is not set, the backend falls back to rule-based wording.
 
 ## 4. Deploy the React frontend on Vercel
 
